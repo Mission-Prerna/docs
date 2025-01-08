@@ -29,7 +29,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Backend',
-      items: ['backend/intro'],
+      items: ['backend/intro', 'backend/APIs-Documentation'],
     },
     {
       type: 'category',
