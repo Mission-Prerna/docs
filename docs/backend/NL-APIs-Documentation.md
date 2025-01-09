@@ -1,4 +1,4 @@
-# NL API Documentation
+# NL APIs Documentation
 
 ## Overview
 The NL API provides endpoints for managing assessments, mentor activities, bot telemetry, metadata, and other features. Authentication and role-based access control are implemented to ensure secure usage.
