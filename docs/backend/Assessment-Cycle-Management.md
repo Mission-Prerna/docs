@@ -32,7 +32,8 @@ This document outlines the steps for managing an examiner cycle, including creat
 
    **Below is the user flow diagram**:- 
 
-   ![examiner-assessment-flow](https://github.com/user-attachments/assets/fa0426d2-18ce-40d6-8f25-e901b407b9a7)
+   ![examiner-assessment-flow](../../assessets/backend/examiner-assessment-flow.png)
+
 
 
 ## Table of Contents
