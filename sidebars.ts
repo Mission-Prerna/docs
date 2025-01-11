@@ -29,7 +29,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Backend',
-      items: ['backend/intro'],
+      items: ['backend/intro', 'backend/NL-APIs-Documentation', 'backend/Student-and-Spot-Assessment-Data', 'backend/Assessment-Cycle-Management', 'backend/Bulk-Examiner-Ingestion'],
     },
     {
       type: 'category',
