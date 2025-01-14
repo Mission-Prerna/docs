@@ -106,7 +106,7 @@ To manage examiners, you can either invalidate all existing examiners and add ne
 
 ### Invalidate All Existing Examiners and Add Bulk Examiners
 
-For instructions on invalidating all existing examiners and adding new ones in bulk, follow the documentation at [bulk-examiner-ingestion doc](./Bulk-Examiner-Ingestion.md).
+For instructions on invalidating all existing examiners and adding new ones in bulk, follow the documentation at [bulk-examiner-ingestion doc](./scripts/bulk-examiner-ingestion.md).
 
 ### Add a New Examiner Individually
 
