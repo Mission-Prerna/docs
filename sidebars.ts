@@ -30,9 +30,9 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Backend',
       items: [
-        'backend/NL-APIs-Documentation', 
-        'backend/Student-and-Spot-Assessment-Data', 
-        'backend/Assessment-Cycle-Management',
+        'backend/nl-apis-documentation', 
+        'backend/student-and-spot-assessment-data', 
+        'backend/assessment-cycle-management',
         {
           type: 'category',
           label: 'Scripts',
