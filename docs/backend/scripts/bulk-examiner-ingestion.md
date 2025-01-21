@@ -41,7 +41,7 @@ pip install -r requirements.txt
 
 2. **CSV File**
 
-   The script expects a CSV file named `bulk-examiner-ingestion.csv` located at `bin/ingest/`. You can find the sample CSV file [here](../bin/ingest/bulk-examiner-ingestion-sample.csv).
+   The script expects a CSV file named `bulk-examiner-ingestion.csv` located at `bin/ingest/`. You can find the sample CSV file [here](../../../assessets/backend/bulk-examiner-ingestion-sample.csv).
 
    The CSV file should contain the following columns:
 

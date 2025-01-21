@@ -29,7 +29,24 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Backend',
-      items: ['backend/NL-APIs-Documentation', 'backend/Student-and-Spot-Assessment-Data', 'backend/Assessment-Cycle-Management', 'backend/Bulk-Examiner-Ingestion'],
+      items: [
+        'backend/nl-apis-documentation', 
+        'backend/student-and-spot-assessment-data', 
+        'backend/assessment-cycle-management',
+        {
+          type: 'category',
+          label: 'Scripts',
+          items: [
+            'backend/scripts/student-bulk-update',
+            'backend/scripts/cwsn-students-ingestion',
+            'backend/scripts/mentor-ingestion',
+            'backend/scripts/bulk-examiner-ingestion',
+            'backend/scripts/materialized-view-refresh',
+            'backend/scripts/db-backup-script',
+            'backend/scripts/db-backup-restore',
+          ],
+        },
+      ],
     },
     {
       type: 'category',
