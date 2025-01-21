@@ -30,8 +30,7 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Backend',
       items: [
-        'backend/intro',
-        'backend/NL-Service-Level-Description',
+        'backend/nl-service-level-description',
         'backend/nl-apis-documentation', 
         'backend/student-and-spot-assessment-data', 
         'backend/assessment-cycle-management',
