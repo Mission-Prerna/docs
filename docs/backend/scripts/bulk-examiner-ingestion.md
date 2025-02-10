@@ -21,7 +21,7 @@ pip install -r requirements.txt
 
 1. **Environment Variables**
 
-   The script uses environment variables for configuration. Create a `.env` file in the `bin/ingest/` directory and include the following variables:
+   The script uses environment variables for configuration. Create a `.env` file in the `/home/remote/NL-old/hasura/examiner-bulk-ingestion` directory and include the following variables:
 
      ```plaintext
      FA_API_KEY=<your_fusion_auth_api_key>
@@ -41,7 +41,7 @@ pip install -r requirements.txt
 
 2. **CSV File**
 
-   The script expects a CSV file named `bulk-examiner-ingestion.csv` located at `bin/ingest/`. You can find the sample CSV file [here](../../../assessets/backend/bulk-examiner-ingestion-sample.csv).
+   The script expects a CSV file named `bulk-examiner-ingestion.csv` located at `/home/remote/NL-old/hasura/examiner-bulk-ingestion`. You can find the sample CSV file [here](../../../assessets/backend/bulk-examiner-ingestion-sample.csv).
 
    The CSV file should contain the following columns:
 
@@ -57,7 +57,7 @@ pip install -r requirements.txt
 
 ## Script Overview
 
-The script is located in the `bin/ingest/` directory. Below is an overview of its functions:
+The script is located in the `/home/remote/NL-old/hasura/examiner-bulk-ingestion` directory. Below is an overview of its functions:
 
 ### `load_metadata()`
 
@@ -118,14 +118,14 @@ Orchestrates the entire process:
 7. Logs errors.
 
 ## Running the Script
-Ensure that all necessary environment variables are set and the CSV file is in place inside `bin/ingest/` with name `bulk-examiner-ingestion.csv`.
+Ensure that all necessary environment variables are set and the CSV file is in place inside `/home/remote/NL-old/hasura/examiner-bulk-ingestion` with name `bulk-examiner-ingestion.csv`.
 
 1. **Navigate to Script Directory**
 
-   Change to the `bin/ingest/` directory where the script is located:
+   Change to the `/home/remote/NL-old/hasura/examiner-bulk-ingestion` directory where the script is located:
 
    ```bash
-   cd bin/ingest/
+   cd /home/remote/NL-old/hasura/examiner-bulk-ingestion
    ```
 
 2. **Set Up Virtual Environment**
