@@ -32,6 +32,7 @@ const sidebars: SidebarsConfig = {
       items: [
         'backend/nl-service-level-description',
         'backend/nl-apis-documentation', 
+        'backend/kong-gateway-integration', 
         'backend/student-and-spot-assessment-data', 
         'backend/assessment-cycle-management',
         {

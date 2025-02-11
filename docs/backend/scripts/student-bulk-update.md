@@ -1,6 +1,6 @@
 # Students Bulk Update Script
 
-This Node.js script performs bulk updates for student records in a PostgreSQL database. It reads data from JSON files, deletes existing student records (if applicable), and updates or inserts new records into the database. The script uses **Node.js**, **PostgreSQL**, and **dotenv** for environment configuration.
+These scripts to extract data from an Excel files from  `PrernaStudentData` folder, convert the data to JSON format, and then ingest it into a PostgreSQL database.  It reads data from JSON files, deletes existing student records (if applicable), and updates or inserts new records into the database. The script uses **Node.js**, **PostgreSQL**, and **dotenv** for environment configuration.
 
 ## Table of Contents
 
