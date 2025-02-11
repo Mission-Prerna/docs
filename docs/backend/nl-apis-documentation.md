@@ -7,7 +7,7 @@ The NL API provides endpoints for managing assessments, mentor activities, bot t
 Most endpoints require JWT authentication and are protected with either `JwtAuthGuard` or `JwtAdminGuard`.
 
 ## Note
-While creating a new endpoint (except admin APIs), don't forget to add that route in `kong.yml` file located at `/home/remote/NL-old/hasura/monitoring-nl-apis/kong`.
+While creating a new endpoint (except admin APIs), don't forget to add that route with unique name in `kong.yml` file located at `/home/remote/NL-old/hasura/monitoring-nl-apis/kong` and restart the kong service. You can find the kong configuration example [here](./kong-gateway-integration.md/#example-configuration-in-kongyml).
 
 ## Endpoints
 
