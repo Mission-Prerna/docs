@@ -2,46 +2,54 @@
 sidebar_position: 1
 ---
 
-# Tutorial Intro
+# Overview
+---
+A brief overview of the Nipun Lakshya App and its role in empowering foundational education in Uttar Pradesh.
+---
 
-Let's discover **Docusaurus in less than 5 minutes**.
+# Nipun Lakshya App
 
-## Getting Started
+The **Nipun Lakshya App** is a digital solution developed by the Department of Basic Education, Uttar Pradesh, under the NIPUN Bharat Mission. Designed primarily for Grades 1 to 3, the app helps mentors and teachers conduct quick, standardized spot assessments to measure students’ reading fluency, comprehension, and basic arithmetic skills.
 
-Get started by **creating a new site**.
+## Ecosystem
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+Below is a diagram that illustrates the complete ecosystem of the Nipun Lakshya App. This diagram encompasses all backend services and data integrations that power the application.
 
-### What you'll need
+![Ecosystem](../assessets/backend/nl_high_level.png)
 
-- [Node.js](https://nodejs.org/en/download/) version 18.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+## What It Does
 
-## Generate a new site
+- **Real-Time Assessments:**  
+  Empowers teachers and mentors to evaluate students’ proficiency during school visits, enabling immediate feedback and targeted interventions.
 
-Generate a new Docusaurus site using the **classic template**.
+- **Offline-First Capability:**  
+  Built to work seamlessly even in areas with poor internet connectivity, ensuring that assessments can continue without disruption.
 
-The classic template will automatically be added to your project after you run the command:
+- **Data-Driven Insights:**  
+  Generates instant scorecards that help educators identify learning gaps and focus resources where they are most needed.
 
-```bash
-npm init docusaurus@latest my-website classic
-```
+## Key Services
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
+- **Spot Assessments:**  
+  Quickly measure foundational literacy and numeracy skills using an intuitive interface and server-driven assessment engine.
 
-The command also installs all necessary dependencies you need to run Docusaurus.
+- **Integration with Read Along:**  
+  Leverages the Google Read Along (Bhashini) API to accurately assess oral reading fluency, even adapting to local dialects for better accuracy.
 
-## Start your site
+- **Scalable Deployment:**  
+  Designed to support Uttar Pradesh’s vast network of over 4.5 lakh primary school teachers, ensuring reliable performance and robust data integration.
 
-Run the development server:
+## Impact & Benefits
 
-```bash
-cd my-website
-npm run start
-```
+- **Enhanced Learning Outcomes:**  
+  By providing real-time data, the app helps teachers focus on children who need additional support, thus improving overall learning levels.
 
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
+- **Empowered Educators:**  
+  Teachers gain a powerful tool to track progress, compare results over time, and make informed decisions on remedial actions.
 
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
+- **Systemic Change:**  
+  The app supports Uttar Pradesh’s ambitious target to achieve universal foundational literacy and numeracy by 2025–26, setting a replicable model for other states.
 
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+For more details on the broader mission, refer to the [NIPUN Bharat Mission](https://nipunbharat.education.gov.in) and recent coverage by news outlets like [The Times of India](https://timesofindia.indiatimes.com/city/lucknow/over-16k-state-run-primary-schools-in-uttar-pradesh-achieve-fln-and-become-nipun/articleshow/107838701.cms).
+
+---
