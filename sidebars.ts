@@ -19,12 +19,14 @@ const sidebars: SidebarsConfig = {
   // But you can create a sidebar manually
   
   tutorialSidebar: [
-    // 'intro',
+     'intro',
     // 'hello',
     {
       type: 'category',
       label: 'Android',
-      items: ['android/intro'],
+      items: ['android/intro',
+        'android/assessments'
+      ],
     },
     {
       type: 'category',
