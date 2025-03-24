@@ -1,4 +1,4 @@
-# **NL-App Backend Service Level Documentation**  
+# NL-App Backend Service Level Documentation
 
 This document provides an overview of the **NL-App** backend infrastructure, detailing the services, configurations, dependencies, and interconnections.  
 
