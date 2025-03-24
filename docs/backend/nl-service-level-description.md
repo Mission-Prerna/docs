@@ -1,214 +1,199 @@
-# NL-Backend Service Level Documentation
+# **NL-App Backend Service Level Documentation**  
 
-This document describes the services, their purpose, dependencies, and configuration as defined in the provided `docker-compose.yml` file for the NL-App.
-
----
-
-## **1. tsdb (TimescaleDB)**
-### Purpose:
-TimescaleDB is used as the primary database to store application data efficiently with support for time-series data.
-
-### Configuration:
-- **Image**: `timescale/timescaledb:latest-pg14`
-- **Container Name**: `timescale_psql`
-- **Ports**: Exposes port `5432` on host port `8015`.
-- **Volumes**:
-  - `tdb-data`: Stores PostgreSQL database files.
-  - `tsdb.postgresql.conf`: Custom PostgreSQL configuration file.
-  - `/home/remote/nl-tsdb-backups`: Directory for database backups.
-- **Environment Variables**:
-  - `POSTGRES_USER`: `user`
-  - `POSTGRES_PASSWORD`: `password`
-  - `POSTGRES_DB`: `db`
-- **Command**: Sets high performance configurations for:
-  - `shared_buffers=32GB`
-  - `work_mem=32GB`
-  - `max_connections=3200`
+This document provides an overview of the **NL-App** backend infrastructure, detailing the services, configurations, dependencies, and interconnections.  
 
 ---
 
-## **2. hasura-tsdb**
-### Purpose:
-Hasura GraphQL Engine provides an auto-generated GraphQL API for the TimescaleDB.
-
-### Configuration:
-- **Image**: `hasura/graphql-engine:v2.23.0`
-- **Container Name**: `hasura_tsdb`
-- **Ports**: Exposes GraphQL Engine on port `8080` (host port `8011`).
-- **Environment Variables**:
-  - `HASURA_GRAPHQL_DATABASE_URL`: Connection to TimescaleDB.
-  - `HASURA_GRAPHQL_ENABLE_CONSOLE`: `t` (Enables GraphQL Console).
-  - `HASURA_GRAPHQL_ADMIN_SECRET`: Authentication secret for GraphQL API.
-  - `HASURA_GRAPHQL_PG_CONNECTIONS`: `380` (Max Postgres connections).
-  - `HASURA_GRAPHQL_JWT_SECRET`: JWT configuration for authentication.
+## **Table of Contents**  
+1. [Service Groups](#service-groups)  
+2. [Core NL Services](#1-core-nl-services)  
+3. [User Services](#2-user-services)  
+4. [Authentication Services](#3-authentication-services)  
+5. [Data Collection and Management Services](#4-data-collection-and-management-services)  
+6. [Monitoring and Metrics Services](#5-monitoring-and-metrics-services)  
+7. [NL Data Lake](#6-nl-data-lake)  
+8. [Dependencies](#dependencies)  
+9. [Persistent Volumes](#persistent-volumes)  
+10. [Ports Overview](#ports-overview)  
 
 ---
 
-## **3. pgbouncer**
-### Purpose:
-PgBouncer acts as a connection pooler for the TimescaleDB to handle a high number of client connections.
-
-### Configuration:
-- **Image**: `brainsam/pgbouncer:latest`
-- **Ports**: Exposes PgBouncer on port `6432`.
-- **Volumes**:
-  - `userlist.txt`: Contains credentials for PgBouncer.
-- **Environment Variables**:
-  - `DB_HOST`: `tsdb`
-  - `AUTH_TYPE`: `plain`
-  - `DEFAULT_POOL_SIZE`: `500`
-  - `MAX_CLIENT_CONN`: `50000`
-  - `MAX_DB_CONNECTIONS`: `980`
-  - `POOL_MODE`: `transaction`
+## **Service Groups**  
+1. **Core NL Services**: Backend services for NL-App.  
+2. **User Services**: Manages user-related functionalities.  
+3. **Authentication Services**: Handles authentication and identity management.  
+4. **Data Collection and Management Services**: Facilitates data collection and form management.  
+5. **Monitoring and Metrics Services**: Monitors system performance and health.  
+6. **NL Data Lake**: Storage and processing infrastructure for large-scale data.  
 
 ---
 
-## **4. uci-chatbot-helper**
-### Purpose:
-Provides chatbot-related utility functions and services for the NL-App.
+## **1. Core NL Services**  
 
-### Configuration:
-- **Image**: `samagragovernance/nl-uci-chatbot-helper:3.0.0`
-- **Ports**: Exposes on port `3000` (host port `8070`).
-- **Environment Variables**: Loaded from `.uci-chatbot-helper.env`.
+### **1.1 TimescaleDB (TSDB)**  
+- **Purpose**: Time-series database with PostgreSQL compatibility.  
+- **Image**: `timescale/timescaledb:latest-pg14`  
+- **Ports**: `5432` (exposed as `8015`)  
+- **Environment Variables**:  
+  - `POSTGRES_USER=user`  
+  - `POSTGRES_PASSWORD=password`  
+  - `POSTGRES_DB=db`  
+- **Volumes**:  
+  - `tdb-data`: Stores database files.  
+  - `/home/remote/nl-tsdb-backups`: Database backups.  
 
----
+### **1.2 PgBouncer**  
+- **Purpose**: Connection pooling for TimescaleDB.  
+- **Image**: `brainsam/pgbouncer:latest`  
+- **Ports**: `6432`  
+- **Environment Variables**:  
+  - `DB_HOST=tsdb`  
+  - `DEFAULT_POOL_SIZE=500`  
+  - `POOL_MODE=transaction`  
+- **Volumes**:  
+  - `userlist.txt`: Stores credentials.  
 
-## **5. nginx-nl-apis**
-### Purpose:
-Acts as a reverse proxy for the NL APIs.
+### **1.3 NL API Gateway (Kong)**  
+- **Purpose**: API gateway for NL-App.  
+- **Image**: `kong:3.5-ubuntu`  
+- **Ports**:  
+  - `8000` (API Gateway)  
+  - `8001` (Admin API)  
+- **Environment Variables**:  
+  - `KONG_DATABASE=off`  
+  - `KONG_DECLARATIVE_CONFIG=/path/to/kong.yml`  
+- **Volumes**:  
+  - `kong.yml`: API Gateway configuration.  
 
-### Configuration:
-- **Image**: `nginx:latest`
-- **Ports**: Proxies NL APIs traffic from port `4000` to host port `3000`.
-- **Volumes**:
-  - `nginx-nl-apis.conf`: Nginx configuration file.
+### **1.4 NL Backend API**  
+- **Purpose**: Primary backend service.  
+- **Image**: `samagragovernance/nl-apis:4.1.3`  
+- **Environment Variables**: Loaded from `.nl-apis.env`.  
 
----
+### **1.5 Caching (Redis & DragonflyDB)**  
+- **Redis**  
+  - **Image**: `redis:alpine`  
+  - **Ports**: `6379`  
+  - **Volumes**: `redis-nl-apis-data`  
+- **DragonflyDB**  
+  - **Purpose**: High-performance Redis alternative.  
+  - **Image**: `docker.dragonflydb.io/dragonflydb/dragonfly`  
+  - **Ports**: `6379`  
+  - **Volumes**: `dragonfly-nl-apis-data`  
 
-## **6. kong-nl-apis**
-### Purpose:
-Manages API gateway functionalities like rate-limiting, logging, and routing.
-
-### Configuration:
-- **Image**: `kong:3.5-ubuntu`
-- **Ports**:
-  - Admin API on `8001` (host `127.0.0.1:8001`).
-  - Proxy on `8000` (host `127.0.0.1:8445`).
-- **Volumes**:
-  - `kong.yml`: Declarative Kong configuration.
-- **Environment Variables**:
-  - `KONG_DATABASE`: `off` (uses declarative configuration).
-  - `KONG_DECLARATIVE_CONFIG`: Path to `kong.yml`.
-
----
-
-## **7. nl-apis**
-### Purpose:
-The primary backend service for the NL-App, hosting APIs and business logic.
-
-### Configuration:
-- **Image**: `samagragovernance/nl-apis:4.1.3`
-- **Dependencies**:
-  - `redis-nl-apis`
-  - `dragonfly-nl-apis`
-  - `tsdb`
-- **Environment Variables**: Loaded from `.nl-apis.env`.
-- **Scaling**: Allows scaling with workers (`WORKERS` environment variable).
-
----
-
-## **8. redis-nl-apis**
-### Purpose:
-Provides in-memory caching and queuing support for the NL APIs.
-
-### Configuration:
-- **Image**: `redis:alpine`
-- **Ports**: Exposes Redis on `127.0.0.1:8031`.
-- **Volumes**:
-  - `redis-nl-apis-data`: Persists Redis data.
-- **Command**: Configured with:
-  - Append-only file for persistence.
-  - Replication with read/write permissions.
+### **1.6 MinIO**  
+- **Purpose**: Object storage for large files.  
+- **Image**: `bitnami/minio:latest`  
+- **Ports**:  
+  - `9000` (API)  
+  - `9001` (Web UI)  
 
 ---
 
-## **9. dragonfly-nl-apis**
-### Purpose:
-Alternative caching service offering Redis-compatible functionality for high performance.
+## **2. User Services**  
 
-### Configuration:
-- **Image**: `docker.dragonflydb.io/dragonflydb/dragonfly`
-- **Ports**: Exposes Dragonfly on `127.0.0.1:8035`.
-- **Volumes**:
-  - `dragonfly-nl-apis-data`: Persists Dragonfly data.
+### **2.1 User Service**  
+- **Purpose**: Manages user roles and permissions.  
+- **Image**: `samagragovernance/user-service:latest`  
+- **Ports**: `8082`  
+- **Environment Variables**: Loaded from `.user-service.env`.  
 
 ---
 
-## **10. minio**
-### Purpose:
-MinIO is used for object storage, providing S3-compatible APIs.
+## **3. Authentication Services**  
 
-### Configuration:
-- **Image**: `bitnami/minio:latest`
-- **Ports**:
-  - `9000`: S3-compatible API.
-  - `9001`: MinIO web interface.
-- **Volumes**:
-  - `storage`: Persists object data.
-- **Environment Variables**:
-  - `MINIO_ROOT_USER`: Admin username.
-  - `MINIO_ROOT_PASSWORD`: Admin password.
+### **3.1 FusionAuth**  
+- **Purpose**: Identity and authentication management.  
+- **Image**: `fusionauth/fusionauth-app:latest`  
+- **Ports**: `9011`  
+- **Volumes**:  
+  - `fusionauth-config`: Stores configuration.  
+- **Environment Variables**:  
+  - `DATABASE_URL`: PostgreSQL connection.  
 
----
-
-## **11. bull-exporter**
-### Purpose:
-Exports metrics for the Bull queue system to a Prometheus-compatible monitoring system.
-
-### Configuration:
-- **Image**: `uphabit/bull_exporter:latest`
-- **Ports**: Exposes metrics on port `9674`.
-- **Environment Variables**:
-  - `EXPORTER_QUEUES`: Monitored queues (e.g., `AssessmentVisitResults`).
-  - `EXPORTER_REDIS_URL`: Redis URL for queue monitoring.
-  - `EXPORTER_PREFIX`: Prefix for metrics (e.g., `prod`).
+### **3.2 Gatekeeper**  
+- **Purpose**: Authentication and authorization service.  
+- **Image**: `samagragovernance/gatekeeper-be:latest`  
+- **Ports**: `8065:3000`  
+- **Volumes**:  
+  - `configurations`: Stores authentication settings.  
 
 ---
 
-## **Volumes**
-### Persistent Storage:
-- **`db-data`**: Stores PostgreSQL data.
-- **`tdb-data`**: Stores TimescaleDB data.
-- **`logs`**: Stores logs for debugging (commented out in `hasura-tsdb`).
-- **`storage`**: Object storage for MinIO.
+## **4. Data Collection and Management Services**  
+
+### **4.1 ODK Central**  
+- **Purpose**: Manages ODK forms and survey data.  
+- **Components**:  
+  - PostgreSQL (`postgres:9.6`)  
+  - Mail Service (`itsissa/namshi-smtp`)  
+  - Enketo Web Forms  
+  - Redis (`redis:5`)  
+
+### **4.2 ODK-Zip-Nginx**  
+- **Purpose**: Handles ODK form uploads in ZIP format.  
+- **Image**: `nginx:latest`  
+- **Ports**: `${PORT}:80`  
+- **Volumes**:  
+  - `static`: Directory for serving static files.  
+- **Environment Variables**: Loaded from `.env`  
 
 ---
 
-## **Ports Overview**
-| Service            | Internal Port | Host Port | Description                    |
-|--------------------|---------------|-----------|--------------------------------|
-| tsdb              | 5432          | 8015      | TimescaleDB                    |
-| hasura-tsdb       | 8080          | 8011      | Hasura GraphQL Engine          |
-| pgbouncer         | 6432          | 6432      | Connection Pooler              |
-| uci-chatbot-helper| 3000          | 8070      | Chatbot Helper                 |
-| nginx-nl-apis     | 4000          | 3000      | Reverse Proxy                  |
-| kong-nl-apis      | 8000, 8001    | 8445, 8001| API Gateway                    |
-| redis-nl-apis     | 6379          | 8031      | Redis Cache                    |
-| dragonfly-nl-apis | 6379          | 8035      | Dragonfly Cache                |
-| minio             | 9000, 9001    | 9000, 9001| Object Storage (S3, Web UI)    |
-| bull-exporter     | 9538          | 9674      | Bull Queue Metrics Exporter    |
+## **5. Monitoring and Metrics Services**  
+
+### **5.1 Metrics Stack**  
+- **Node Exporter** (`prom/node-exporter:v0.18.1`)  
+- **cAdvisor** (`gcr.io/cadvisor/cadvisor:v0.47.0`)  
+- **Caddy** (`caddy:2.6.2`)  
+- **PGWatch2** (`cybertec/pgwatch2-postgres`)  
 
 ---
 
-## **Dependencies**
-- **tsdb**: Core database for most services.
-- **redis-nl-apis & dragonfly-nl-apis**: Caching layers for better performance.
-- **MinIO**: Object storage for file and data assets.
-- **PgBouncer**: Handles high-volume database connections.
-- **Hasura**: Provides a GraphQL interface for TimescaleDB.
-- **Kong**: Manages API gateway functionalities.
+## **6. NL Data Lake**  
+
+### **6.1 Overview**  
+- **Purpose**: Centralized data storage for analytical workloads.  
+- **Services**:  
+  - Object Storage (MinIO)  
+  - Distributed Processing (Spark)  
+  - Data Ingestion Pipelines (Kafka, Airflow)  
+  - Data Warehouse (ClickHouse, BigQuery)  
 
 ---
 
-This documentation provides a comprehensive overview of the NL-App services, their configurations, dependencies, and purposes.
+## **Dependencies**  
+- PostgreSQL  
+- Redis & DragonflyDB  
+- FusionAuth  
+- ODK Central  
+- Kong API Gateway  
+- Metrics Stack  
+
+---
+
+## **Persistent Volumes**  
+- `configurations`  
+- `secrets`  
+- `pgwatch2_pg`  
+- `pgwatch2_grafana`  
+- `pgwatch2_pw2`  
+
+---
+
+## **Ports Overview**  
+
+| Service            | Internal Port | Host Port | Description                    |  
+|--------------------|--------------|-----------|--------------------------------|  
+| NL Backend API    | 8081         | 8081      | Primary API service            |  
+| NL Kong Gateway   | 8000, 8001   | 8000, 8001| API Gateway & Kong Gateway Admin API        |  
+| User Service      | 8082         | 8082      | User management                |  
+| FusionAuth        | 9011         | 9011      | Authentication & identity      |  
+| Gatekeeper       | 3000         | 8065      | Authentication gateway         |  
+| ODK Central      | Various      | Various   | ODK form management            |  
+| Metrics (cAdvisor) | 8080        | 8091      | Container metrics monitoring   |  
+| Metrics (PGWatch2) | 3000       | 3333      | PostgreSQL performance stats   |  
+
+---
+
+This documentation provides a **structured overview** of the **NL-App backend services**, their configurations, dependencies, and purposes. 🚀
