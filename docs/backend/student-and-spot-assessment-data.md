@@ -4,11 +4,19 @@
 
 This API provides endpoints to retrieve student and spot assessment data within a specified date range. The data can be filtered by various parameters such as date range, limit, offset, and actor type.
 
-## Student Assessment:- 
-Student assessment data done by the Teacher, Mentor, and examiner usually aims to evaluate performance or compliance over a defined period.
+---
 
-## Spot Assessment:-
-Spot assessments, done by mentors only, are often used to check adherence to standards or procedures in real-time, potentially identifying issues or irregularities that might not be apparent during planned assessments., data
+## Student Assessment
+
+Student assessment data done by the Teacher, Mentor, and Examiner usually aims to evaluate performance or compliance over a defined period.
+
+---
+
+## Spot Assessment
+
+Spot assessments, done by mentors only, are often used to check adherence to standards or procedures in real-time, potentially identifying issues or irregularities that might not be apparent during planned assessments.
+
+---
 
 ## Endpoints
 
@@ -16,162 +24,245 @@ Spot assessments, done by mentors only, are often used to check adherence to sta
 
 **URL:** `{{base_url}}/data/student-assessment-data`  
 **Method:** `GET`  
-**Description:** Retrieves student assessment data filtered by date ranges (`from_date`/`to_date` or `synced_from`/`synced_to`), actor type, limit, and offset.
+**Description:** Retrieves student assessment data filtered by date ranges (`from_date`/`to_date` or `synced_from`/`synced_to`), actor type, limit, and pagination using either **offset** or **cursor-based (key-based)** method.
+
+---
 
 **Query Parameters:**
+
 - **Date Range (Required)**:
   - You must provide exactly one date range: either `from_date` and `to_date` **or** `synced_from` and `synced_to`.
-  - If provided, the date range cannot exceed 7 days.
+  - The date range **cannot exceed 31 days**.
   - Dates should be in `YYYY-MM-DD` format.
-  
+
 - **Date Range Parameters**:
   - `from_date` (conditional): Start date for filtering data.
   - `to_date` (conditional): End date for filtering data.
-  - `synced_from` (conditional): Start date for filtering data based on sync dates.
-  - `synced_to` (conditional): End date for filtering data based on sync dates.
+  - `synced_from` (conditional): Start date based on data sync date.
+  - `synced_to` (conditional): End date based on data sync date.
 
-- `limit` (optional): Maximum number of records to return. Default is `100000`.
-- `offset` (optional): Offset for the data retrieval, used for pagination.
-- `actor_type` (optional): Filters data by actor type (`mentor`, `teacher`, `diet mentor`, or `examiner`). Comparison is case-insensitive. If omitted, data for all actor types is retrieved.
+- **Pagination Parameters**:
+  - `limit` (optional): Maximum number of records to return. Default is `100000`.
+  - `offset` (optional): Offset for the data retrieval (used for **offset-based** pagination).
+  - `last_created_at` and `last_mentor_id` (optional): Used for **key-based (cursor)** pagination.
 
-**Usage Rules**:
-- **Mutually Exclusive Date Ranges**: Provide only one date range at a time. If both date ranges (`from_date`/`to_date` and `synced_from`/`synced_to`) are included, an error will be returned.
-- **Required Date Ranges**: Either `from_date` and `to_date` **or** `synced_from` and `synced_to` must be provided. Omitting both ranges will trigger an error.
+- `actor_type` (optional): Filters data by actor type (`mentor`, `teacher`, `diet mentor`, `examiner`). Case-insensitive.
+
+---
+
+**Usage Rules:**
+- **Mutually Exclusive Date Ranges**: Provide only one range (either created_at range or synced_at range).
+- **Required Date Range**: Omitting both will cause an error.
+- **Pagination Choice**: Either use **offset** or **key-based** parameters — not both.
+
+---
 
 **Curl Example:**
+
 ```bash
-curl --location '{{base_url}}/data/student-assessment-data?from_date=2024-08-01&to_date=2024-08-08&limit=5&actor_type=mentor' \
+curl --location '{{base_url}}/data/student-assessment-data?from_date=2024-08-01&to_date=2024-08-31&limit=5&actor_type=mentor' \
 --header 'authorization: Bearer <<admin-token>>'
 ```
 
-**Response:**
-The response will include the following fields:
-- `phone_no`: Mentor's phone number.
-- `class`: The class (grade) of the student.
-- `user_type`: Type of actor (e.g., mentor).
-- `district_name`: Name of the district.
-- `block_name`: Name of the block.
-- `udise`: School's UDISE code.
-- `created_at`: The timestamp when the assessment was created.
-- `synced_at`: The timestamp when the data was synced in DB.
-- `result`: The result of the assessment (NIPUN, NOT NIPUN, or Unknown).
-- `student`: JSON object containing student details, if available:
-  - `student_id`: Unique ID of the student.
-  - `student_name`: Name of the student.
-  - `gender`: Gender of the student.
-  - `roll_no`: Roll number of the student.
-  - `class`: Class (grade) of the student.
-  - `udise`: UDISE code of the student's school.
+---
 
+**Response Fields:**
+- `mentor_id`: Mentor's  ID.
+- `phone_no`: Mentor's phone number.
+- `class`: The student's class (grade).
+- `user_type`: Type of actor (e.g., mentor, teacher).
+- `district_name`: District name.
+- `block_name`: Block name.
+- `udise`: UDISE code of the school.
+- `created_at`: When the assessment was created.
+- `synced_at`: When the assessment was synced.
+- `result`: 'NIPUN', 'NOT NIPUN', or 'Unknown'.
+- `student`: JSON object (if student info available):
+  - `student_id`
+  - `student_name`
+  - `gender`
+  - `roll_no`
+  - `class`
+  - `udise`
+
+---
 
 ### 2. Spot Assessment Data
 
 **URL:** `{{base_url}}/data/spot-assessment-data`  
 **Method:** `GET`  
-**Description:** Retrieves spot assessment data filtered by the specified date range, limit, and offset.
+**Description:** Retrieves spot assessment data filtered by date range and pagination.
+
+---
 
 **Query Parameters:**
-- `from_date` (required): Start date for the data filter in `YYYY-MM-DD` format.
-- `to_date` (required): End date for the data filter in `YYYY-MM-DD` format.
-- `limit` (optional): Maximum number of records to return. Default is `100000`.
-- `offset` (optional): Offset for the data retrieval, used for pagination.
+- `from_date` (required): Start date (`YYYY-MM-DD`).
+- `to_date` (required): End date (`YYYY-MM-DD`).
+- `limit` (optional): Default `100000`.
+- `offset` (optional): For pagination.
 
+---
 
 **Curl Example:**
+
 ```bash
-curl --location '{{base_url}}/data/spot-assessment-data?limit=50&from_date=2024-04-01&to_date=2024-06-01' \
+curl --location '{{base_url}}/data/spot-assessment-data?limit=50&from_date=2024-04-01&to_date=2024-04-30' \
 --header 'authorization: Bearer <<admin-token>>'
 ```
 
-**Response:**
-The response will include the following fields:
-- `phone_no`: Mentor's phone number.
-- `student_id`: Unique ID of the student (if available).
-- `class`: The class (grade) of the student.
-- `user_type`: Type of actor (e.g., mentor).
-- `district_name`: Name of the district.
-- `block_name`: Name of the block.
-- `udise`: School's UDISE code.
-- `created_at`: The timestamp when the assessment was created.
-- `result`: The result of the assessment (NIPUN, NOT NIPUN).
+---
 
+**Response Fields:**
+- `phone_no`
+- `student_id`
+- `class`
+- `user_type`
+- `district_name`
+- `block_name`
+- `udise`
+- `created_at`
+- `result`
 
-## API Call Process
+---
 
-1. **Set Date Range:**  
-   Ensure that the difference between `from_date` and `to_date` does not exceed 7 days. If it does, the API will return a `400` error.
+# 🚀 API Call Process
 
-2. **Limit Records:**  
-   By default, the API returns up to `100000` records in a single call. If you need fewer records, you can adjust the `limit` parameter.
+To efficiently retrieve large amounts of data without missing or duplicating records, follow the correct **pagination method**:
 
-3. **Offset Management:**  
-   The `offset` parameter is used to manage pagination. Initially, set the `offset` to `0`. If the first call returns data, increment the `offset` by the `limit` value and make another call. Repeat this process until the API returns an empty response, indicating that all available data has been retrieved.  
-   
-   **Example:**
-   - First call: `offset=0`
+---
 
-      **Curl Example:**
-     
-      ```bash
-       curl --location '{{base_url}}/data/student-assessment-data?from_date=2024-08-05&to_date=2024-08-06&limit=100000&offset=0&actor_type=teacher' \
-       --header 'authorization: Bearer <admin-token>'
-     ```
-   - Second call: `offset=100000` (assuming `limit=100000`)
-     
-      **Curl Example:**
-     
-      ```bash
-       curl --location '{{base_url}}/data/student-assessment-data?from_date=2024-08-05&to_date=2024-08-06&limit=100000&offset=100000&actor_type=teacher' \
-       --header 'authorization: Bearer <admin-token>'
-     ```
-   - Third call: `offset=200000` (assuming `limit=100000`)
+## 1. **Set Date Range**
+- Always provide a valid date range.
+- **Maximum allowed window: 31 days**.
+- Exceeding 31 days will result in a `400` error.
 
-      **Curl Example:**
-     
-      ```bash
-         curl --location '{{base_url}}/data/student-assessment-data?from_date=2024-08-05&to_date=2024-08-06&limit=100000&offset=20000&actor_type=teacher' \
-         --header 'authorization: Bearer <admin-token>'  
-     ```
-   - **Continue incrementing** the `offset` by the `limit` value until no more data is returned.
+---
 
-   **Important:** If you change the `from_date` or `to_date`, reset the `offset` to `0`. This ensures you retrieve the complete and correct dataset from the new date range without missing or duplicating records.
+## 2. **Limit Records**
+- Default maximum: **100000** records per call.
+- Adjust the `limit` as needed for your application.
 
-## Error Handling
+---
 
-The API includes comprehensive error handling to ensure that requests are processed correctly. Below are the common errors you might encounter:
+## 3. **Pagination Methods**
 
-1. **Invalid Date Format (`400 Bad Request`)**  
-   - **Condition:** The `from_date` or `to_date` is either missing or not in the correct `YYYY-MM-DD` format.
-   - **Error Message:** `"Invalid date format. Please provide dates in 'YYYY-MM-DD' format."`
+### ➡️ Offset-Based Pagination
 
-2. **Date Range Exceeded (`400 Bad Request`)**  
-   - **Condition:** The difference between `from_date` and `to_date` exceeds the maximum allowed range of 7 days.
-   - **Error Message:** `"Date range exceeded. The maximum allowed range is 7 days."`
+Simple pagination using `limit` and `offset`.
 
-3. **Invalid Limit or Offset (`400 Bad Request`)**  
-   - **Condition:** The `limit` or `offset` is not a valid number or is out of the allowed range.
-   - **Error Message:** `"Invalid limit or offset value. Please provide a valid number."`
+**Steps:**
+1. Start with `offset=0`.
+2. Increment `offset` by `limit` after each call.
+3. Stop when the API returns an empty result.
 
-4. **Missing Authorization (`401 Unauthorized`)**  
-   - **Condition:** The request does not include a valid `Bearer` token in the authorization header.
-   - **Error Message:** `"Authorization token is missing or invalid."`
+---
 
-5. **Forbidden Access (`403 Forbidden`)**  
-   - **Condition:** The `Bearer` token provided does not have the necessary permissions to access the data.
-   - **Error Message:** `"You do not have permission to access this resource."`
+**Example Flow:**
 
-6. **Internal Server Error (`500 Internal Server Error`)**  
-   - **Condition:** An unexpected error occurs on the server while processing the request.
-   - **Error Message:** `"An unexpected error occurred. Please try again later."`
+- **First Call**: `offset=0`
+  ```bash
+  curl --location '{{base_url}}/data/student-assessment-data?from_date=2024-08-05&to_date=2024-08-06&limit=100000&offset=0&actor_type=teacher' \
+  --header 'authorization: Bearer <admin-token>'
+  ```
 
-## Authorization
+- **Second Call**: `offset=100000`
+  ```bash
+  curl --location '{{base_url}}/data/student-assessment-data?from_date=2024-08-05&to_date=2024-08-06&limit=100000&offset=100000&actor_type=teacher' \
+  --header 'authorization: Bearer <admin-token>'
+  ```
 
-A valid `Bearer` token is required in the authorization header for all API calls. Ensure that the token has the necessary permissions to access the data.
+- **Third Call**: `offset=200000`
+  ```bash
+  curl --location '{{base_url}}/data/student-assessment-data?from_date=2024-08-05&to_date=2024-08-06&limit=100000&offset=200000&actor_type=teacher' \
+  --header 'authorization: Bearer <admin-token>'
+  ```
 
-## Environment Variables
+- Continue increasing until no data is returned.
 
-- `DEFAULT_DATA_LIMIT`: Default limit for the number of records returned (default: `100000`).
-- `MAX_DATE_RANGE_DAYS`: Maximum allowed days between `from_date` and `to_date` (default: `7` days).
+> 🔔 **Note:** Reset `offset=0` whenever you change the date window.
 
---- 
+---
 
+### ➡️ Key-Based (Cursor) Pagination
+
+More reliable and recommended for large or dynamic datasets.
+
+**Steps:**
+1. First call: No `last_created_at` or `last_mentor_id`.
+2. From the last record received, capture `created_at` and `mentor_id`.
+3. In the next call, pass those as `last_created_at` and `last_mentor_id`.
+4. Repeat the process until no more data.
+
+---
+
+**First Call:**
+```bash
+curl --location '{{base_url}}/data/student-assessment-data?from_date=2024-08-05&to_date=2024-08-06&limit=1000' \
+--header 'authorization: Bearer <admin-token>'
+```
+
+**Sample Last Record from Response:**
+```json
+{
+  "mentor_id": 5678,
+  "created_at": "2024-08-05T10:45:00"
+}
+```
+
+**Second Call (cursor-based):**
+```bash
+curl --location '{{base_url}}/data/student-assessment-data?from_date=2024-08-05&to_date=2024-08-06&limit=1000&last_created_at=2024-08-05T10:45:00&last_mentor_id=5678' \
+--header 'authorization: Bearer <admin-token>'
+```
+
+---
+
+> 🔔 **Note:**  
+> - Do not send `offset` when using cursor-based pagination.
+> - Always pick the last record's `created_at` and `mentor_id` for the next page.
+> - Reset cursor when changing the date window.
+
+---
+
+# 📋 Pagination Summary
+
+| Method        | How to Paginate                             | Recommended For               |
+|---------------|---------------------------------------------|--------------------------------|
+| Offset-Based  | `limit` + `offset`                          | Small stable datasets          |
+| Key-Based     | `limit` + `last_created_at` + `last_mentor_id` | Large, live-updating datasets |
+
+---
+
+# ❗ Error Handling
+
+The API includes robust error handling:
+
+| Error | Cause | Message |
+|------|-------|---------|
+| `400 Bad Request` | Invalid/missing dates, invalid limit/offset | "Invalid input." |
+| `400 Bad Request` | Both cursor and offset used | "Use either offset or cursor-based pagination" |
+| `400 Bad Request` | Date window > 31 days | "Date range exceeded. The maximum allowed range is 31 days." |
+| `401 Unauthorized` | Missing/invalid token | "Authorization token is missing or invalid." |
+| `403 Forbidden` | Token lacks permission | "You do not have permission to access this resource." |
+| `500 Internal Server Error` | Unexpected error | "An unexpected error occurred." |
+
+---
+
+# 🔐 Authorization
+
+All API calls require a valid `Bearer` token in the `Authorization` header.
+
+Example:
+```bash
+Authorization: Bearer <your-token>
+```
+
+---
+
+# ✅ Quick Checklist Before Calling API
+- Set valid date range (max 31 days).
+- Decide whether to use **offset** or **cursor** pagination.
+- Fetch token and add to Authorization header.
+- Start with `offset=0` or no cursor for the first page.
+
+---
